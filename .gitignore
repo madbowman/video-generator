@@ -1,1 +1,67 @@
+# Output directories
 video_outputs/
+
+# Temporary files
+temp_voice_*.wav
+temp_script_*.txt
+temp_prompts_*.txt
+
+# Python cache and bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Virtual environments
+venv/
+env/
+.env
+.venv
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Session files
+session_*.json
+
+# Voice samples (optional - uncomment if you don't want to track them)
+# voice_samples/
+
+# Audio outputs
+*.wav
+*.mp3
+*.flac
+
+# Video outputs
+*.mp4
+*.avi
+*.mov
+
+# Image outputs
+generated_images/
+*.png
+*.jpg
+*.jpeg
+
+# Model files (usually large)
+*.safetensors
+*.ckpt
+*.bin
+
+# Streamlit cache
+.streamlit/
