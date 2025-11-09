@@ -1,0 +1,107 @@
+{
+  "workflow_info": {
+    "name": "Pixar Style Img2Img with Flux",
+    "description": "Use this workflow with Flux.1-dev for Pixar-style image generation with reference images",
+    "instructions": [
+      "1. Import this workflow into ComfyUI",
+      "2. Make sure flux1-dev.safetensors is in your models/checkpoints folder",
+      "3. The Python script will automatically populate the nodes",
+      "4. This is a reference - the script generates workflows programmatically"
+    ]
+  },
+  "nodes": {
+    "LoadImage": {
+      "node_id": "10",
+      "purpose": "Loads the reference image for img2img",
+      "inputs": {
+        "image": "reference_image_name.png"
+      }
+    },
+    "CheckpointLoader": {
+      "node_id": "4",
+      "purpose": "Loads the Flux.1-dev model",
+      "inputs": {
+        "ckpt_name": "flux1-dev.safetensors"
+      }
+    },
+    "PositivePrompt": {
+      "node_id": "6",
+      "purpose": "Main prompt with Pixar style prefix",
+      "inputs": {
+        "text": "pixar animation style, {your_prompt}, high quality, detailed, professional animation"
+      }
+    },
+    "NegativePrompt": {
+      "node_id": "7",
+      "purpose": "Negative prompt to avoid bad results",
+      "inputs": {
+        "text": "low quality, blurry, distorted, ugly, bad anatomy, watermark, text"
+      }
+    },
+    "VAEEncode": {
+      "node_id": "11",
+      "purpose": "Encodes reference image to latent space",
+      "inputs": {
+        "width": 1024,
+        "height": 1024,
+        "batch_size": 1
+      }
+    },
+    "KSampler": {
+      "node_id": "3",
+      "purpose": "Main sampling node",
+      "inputs": {
+        "seed": "random",
+        "steps": 20,
+        "cfg": 7.0,
+        "sampler_name": "euler",
+        "scheduler": "normal",
+        "denoise": 0.75
+      },
+      "notes": "denoise=0.75 means 75% new generation, 25% reference image influence"
+    },
+    "VAEDecode": {
+      "node_id": "8",
+      "purpose": "Decodes latent back to image"
+    },
+    "SaveImage": {
+      "node_id": "9",
+      "purpose": "Saves the generated image",
+      "inputs": {
+        "filename_prefix": "pixar_batch"
+      }
+    }
+  },
+  "workflow_tips": {
+    "denoise_values": {
+      "0.5-0.6": "Very close to reference, minimal changes",
+      "0.7-0.75": "Balanced (recommended for Pixar style)",
+      "0.8-0.9": "More creative, less reference influence",
+      "1.0": "Completely ignore reference (text2img mode)"
+    },
+    "cfg_scale": {
+      "5-7": "More creative, looser interpretation",
+      "7-10": "Balanced (recommended)",
+      "10-15": "Very strict prompt adherence"
+    },
+    "steps": {
+      "15-20": "Fast, good quality",
+      "20-30": "Better quality (recommended)",
+      "30-50": "Maximum quality, slower"
+    }
+  },
+  "alternative_models": {
+    "flux1-schnell.safetensors": {
+      "speed": "Fast (4-8 steps)",
+      "quality": "Good",
+      "recommended_steps": 4,
+      "notes": "Use for quick iterations"
+    },
+    "sd_xl_base_1.0.safetensors": {
+      "speed": "Medium",
+      "quality": "Good with Pixar LoRA",
+      "recommended_steps": 25,
+      "notes": "Add Pixar LoRA for best results"
+    }
+  }
+}

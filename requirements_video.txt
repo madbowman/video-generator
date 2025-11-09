@@ -1,0 +1,26 @@
+# Unified Video Generator Requirements
+# Combines audio TTS and image generation dependencies
+
+# Core dependencies
+gradio>=5.0.0
+streamlit>=1.28.0
+requests>=2.31.0
+Pillow>=10.0.0
+numpy>=1.25.0
+scipy>=1.10.0
+torch>=2.0.0
+torchaudio>=2.0.0
+
+# Audio TTS dependencies
+chatterbox-tts>=0.1.4
+transformers>=4.40.0
+
+# Optional dependencies for enhanced features
+# Uncomment if needed:
+# torchvision>=0.15.0
+# diffusers>=0.25.0
+# python-dotenv>=1.0.0
+
+# Note: FFmpeg is required for video creation but must be installed separately
+# Windows: Download from https://ffmpeg.org/download.html
+# Add FFmpeg to your system PATH

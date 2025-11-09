@@ -1,0 +1,353 @@
+﻿{
+    "timestamp":  "2025-08-27T19:36:12.5136594-04:00",
+    "host":  "ERIC_AI",
+    "summary":  {
+                    "os":  "Windows 10 Pro 24H2 (Build 26100)",
+                    "cpu":  "AMD Ryzen AI 9 HX 370 w/ Radeon 890M           ",
+                    "ram":  "63.12 TB",
+                    "gpus":  "NVIDIA GeForce RTX 5070 Laptop GPU",
+                    "ollama":  "Detected (0.11.7)"
+                },
+    "os":  {
+               "name":  "Windows 10 Pro",
+               "version":  "24H2",
+               "build":  "26100",
+               "architecture":  "AMD64",
+               "installDate":  "2025-07-02T10:24:24.0000000Z",
+               "lastBoot":  "2025-08-27T21:22:59.5000000Z",
+               "uptimeHours":  2.2,
+               "timezone":  "Eastern Standard Time",
+               "culture":  "en-US",
+               "bios":  {
+                            "manufacturer":  "American Megatrends International, LLC.",
+                            "version":  "H7606WP.302",
+                            "releaseDate":  "2025-05-06T00:00:00.0000000Z"
+                        },
+               "tpm":  {
+                           "present":  false
+                       },
+               "secureBoot":  null
+           },
+    "cpu":  {
+                "name":  "AMD Ryzen AI 9 HX 370 w/ Radeon 890M           ",
+                "cores":  12,
+                "threads":  24,
+                "maxMHz":  2000,
+                "vt":  {
+                           "virtualizationFirmwareEnabled":  true,
+                           "secondLevelAddressTranslation":  false
+                       }
+            },
+    "memory":  {
+                   "totalBytes":  67773509632,
+                   "totalHuman":  "63.12 GB",
+                   "dimms":  [
+                                 {
+                                     "capacity":  17179869184,
+                                     "capacityHuman":  "16.00 GB",
+                                     "speed":  7500,
+                                     "form":  1,
+                                     "manufacturer":  "Samsung",
+                                     "part":  "K3KLALA0DM-MGCU     "
+                                 },
+                                 {
+                                     "capacity":  17179869184,
+                                     "capacityHuman":  "16.00 GB",
+                                     "speed":  7500,
+                                     "form":  1,
+                                     "manufacturer":  "Samsung",
+                                     "part":  "K3KLALA0DM-MGCU     "
+                                 },
+                                 {
+                                     "capacity":  17179869184,
+                                     "capacityHuman":  "16.00 GB",
+                                     "speed":  7500,
+                                     "form":  1,
+                                     "manufacturer":  "Samsung",
+                                     "part":  "K3KLALA0DM-MGCU     "
+                                 },
+                                 {
+                                     "capacity":  17179869184,
+                                     "capacityHuman":  "16.00 GB",
+                                     "speed":  7500,
+                                     "form":  1,
+                                     "manufacturer":  "Samsung",
+                                     "part":  "K3KLALA0DM-MGCU     "
+                                 }
+                             ]
+               },
+    "gpu":  [
+                {
+                    "name":  "NVIDIA GeForce RTX 5070 Laptop GPU",
+                    "driver":  "577.00",
+                    "vram":  "8151 MiB",
+                    "source":  "nvidia-smi"
+                }
+            ],
+    "disks":  [
+                  {
+                      "name":  "WD PC SN740 SDDPNQE-2T00-1202",
+                      "type":  "SSD",
+                      "size":  2048408248320,
+                      "sizeHuman":  "1.86 TB",
+                      "health":  "Healthy"
+                  }
+              ],
+    "volumes":  [
+                    {
+                        "letter":  null,
+                        "fs":  "NTFS",
+                        "label":  "RECOVERY",
+                        "size":  1048571904,
+                        "sizeHuman":  "1,000.00 MB",
+                        "free":  55308288,
+                        "freeHuman":  "52.75 MB",
+                        "freePct":  5.3,
+                        "health":  "Healthy",
+                        "path":  null
+                    },
+                    {
+                        "letter":  null,
+                        "fs":  "NTFS",
+                        "label":  "RESTORE",
+                        "size":  26843541504,
+                        "sizeHuman":  "25.00 GB",
+                        "free":  3968765952,
+                        "freeHuman":  "3.70 GB",
+                        "freePct":  14.8,
+                        "health":  "Healthy",
+                        "path":  null
+                    },
+                    {
+                        "letter":  null,
+                        "fs":  "FAT32",
+                        "label":  "MYASUS",
+                        "size":  268435456,
+                        "sizeHuman":  "256.00 MB",
+                        "free":  167342080,
+                        "freeHuman":  "159.59 MB",
+                        "freePct":  62.3,
+                        "health":  "Healthy",
+                        "path":  null
+                    },
+                    {
+                        "letter":  "C",
+                        "fs":  "NTFS",
+                        "label":  "OS",
+                        "size":  2019951972352,
+                        "sizeHuman":  "1.84 TB",
+                        "free":  1146471542784,
+                        "freeHuman":  "1.04 TB",
+                        "freePct":  56.8,
+                        "health":  "Healthy",
+                        "path":  "C:\\"
+                    }
+                ],
+    "network":  {
+                    "adapters":  [
+                                     {
+                                         "name":  "NordLynx",
+                                         "desc":  "NordLynx Tunnel",
+                                         "status":  "Up",
+                                         "linkSpeed":  "100 Gbps"
+                                     },
+                                     {
+                                         "name":  "vEthernet (Default Switch)",
+                                         "desc":  "Hyper-V Virtual Ethernet Adapter",
+                                         "status":  "Up",
+                                         "linkSpeed":  "10 Gbps"
+                                     },
+                                     {
+                                         "name":  "Wi-Fi 4",
+                                         "desc":  "MediaTek Wi-Fi 7 MT7925 Wireless LAN Card",
+                                         "status":  "Not Present",
+                                         "linkSpeed":  "0 bps"
+                                     },
+                                     {
+                                         "name":  "Wi-Fi 5",
+                                         "desc":  "MediaTek Wi-Fi 7 MT7925 Wireless LAN Card",
+                                         "status":  "Not Present",
+                                         "linkSpeed":  "0 bps"
+                                     },
+                                     {
+                                         "name":  "OpenVPN Data Channel Offload for NordVPN",
+                                         "desc":  "OpenVPN Data Channel Offload",
+                                         "status":  "Disconnected",
+                                         "linkSpeed":  "1 Gbps"
+                                     },
+                                     {
+                                         "name":  "Wi-Fi 3",
+                                         "desc":  "MediaTek Wi-Fi 7 MT7925 Wireless LAN Card",
+                                         "status":  "Disconnected",
+                                         "linkSpeed":  "0 bps"
+                                     },
+                                     {
+                                         "name":  "Wi-Fi",
+                                         "desc":  "MediaTek Wi-Fi 7 MT7925 Wireless LAN Card",
+                                         "status":  "Up",
+                                         "linkSpeed":  "2.4 Gbps"
+                                     },
+                                     {
+                                         "name":  "Local Area Connection 2",
+                                         "desc":  "TAP-NordVPN Windows Adapter V9",
+                                         "status":  "Disconnected",
+                                         "linkSpeed":  "1 Gbps"
+                                     }
+                                 ],
+                    "ip":  [
+                               {
+                                   "iface":  "vEthernet (Default Switch)",
+                                   "ipv4":  "192.168.224.1",
+                                   "ipv6":  "",
+                                   "dns":  "fec0:0:0:ffff::1, fec0:0:0:ffff::2, fec0:0:0:ffff::3",
+                                   "gateway":  null
+                               },
+                               {
+                                   "iface":  "NordLynx",
+                                   "ipv4":  "10.5.0.2",
+                                   "ipv6":  "",
+                                   "dns":  "fec0:0:0:ffff::1, fec0:0:0:ffff::2, fec0:0:0:ffff::3",
+                                   "gateway":  null
+                               },
+                               {
+                                   "iface":  "Wi-Fi",
+                                   "ipv4":  "192.168.68.62",
+                                   "ipv6":  "",
+                                   "dns":  "209.18.47.62, 209.18.47.61",
+                                   "gateway":  "192.168.68.1"
+                               },
+                               {
+                                   "iface":  "Wi-Fi 3",
+                                   "ipv4":  "169.254.223.72",
+                                   "ipv6":  "",
+                                   "dns":  "fec0:0:0:ffff::1, fec0:0:0:ffff::2, fec0:0:0:ffff::3",
+                                   "gateway":  null
+                               },
+                               {
+                                   "iface":  "OpenVPN Data Channel Offload for NordVPN",
+                                   "ipv4":  "169.254.75.177",
+                                   "ipv6":  "",
+                                   "dns":  "fec0:0:0:ffff::1, fec0:0:0:ffff::2, fec0:0:0:ffff::3",
+                                   "gateway":  null
+                               },
+                               {
+                                   "iface":  "Local Area Connection 2",
+                                   "ipv4":  "169.254.15.70",
+                                   "ipv6":  "",
+                                   "dns":  "fec0:0:0:ffff::1, fec0:0:0:ffff::2, fec0:0:0:ffff::3",
+                                   "gateway":  null
+                               }
+                           ]
+                },
+    "battery":  {
+                    "EstimatedChargeRemaining":  84,
+                    "Status":  "OK",
+                    "present":  true
+                },
+    "toolchains":  {
+                       "PowerShell":  {
+                                          "windows":  "5.1.26100.4768",
+                                          "core":  "7.5.2"
+                                      },
+                       "Python":  {
+                                      "python":  "Python 3.11.7",
+                                      "pip":  "pip 25.2 from C:\\Users\\madbo\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pip (python 3.11)",
+                                      "launcherList":  [
+                                                           "-V:3.13 *        C:\\Users\\madbo\\AppData\\Local\\Programs\\Python\\Python313\\python.exe\r",
+                                                           " -V:3.11          C:\\Users\\madbo\\AppData\\Local\\Programs\\Python\\Python311\\python.exe"
+                                                       ]
+                                  },
+                       "Node":  {
+                                    "node":  "v22.18.0",
+                                    "npm":  null,
+                                    "pnpm":  null,
+                                    "yarn":  null
+                                },
+                       "Git":  "git version 2.50.0.windows.2"
+                   },
+    "platforms":  {
+                      "wsl":  "\u0000 \u0000N\u0000A\u0000M\u0000E\u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000S\u0000T\u0000A\u0000T\u0000E\u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000V\u0000E\u0000R\u0000S\u0000I\u0000O\u0000N\u0000\r\u0000\n\u0000*\u0000 \u0000d\u0000o\u0000c\u0000k\u0000e\u0000r\u0000-\u0000d\u0000e\u0000s\u0000k\u0000t\u0000o\u0000p\u0000 \u0000 \u0000 \u0000 \u0000S\u0000t\u0000o\u0000p\u0000p\u0000e\u0000d\u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u00002\u0000\r\u0000\n\u0000 \u0000 \u0000U\u0000b\u0000u\u0000n\u0000t\u0000u\u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000S\u0000t\u0000o\u0000p\u0000p\u0000e\u0000d\u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u00002\u0000\r\u0000\n\u0000",
+                      "docker":  ""
+                  },
+    "environment":  {
+                        "pathEntries":  [
+                                            "C:\\Windows\\system32",
+                                            "C:\\Windows",
+                                            "C:\\Windows\\System32\\Wbem",
+                                            "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\",
+                                            "C:\\Windows\\System32\\OpenSSH\\",
+                                            "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common",
+                                            "C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR",
+                                            "C:\\Program Files\\dotnet\\",
+                                            "C:\\Program Files\\Git\\cmd",
+                                            "C:\\Program Files\\Docker\\Docker\\resources\\bin",
+                                            "C:\\Program Files\\CMake\\bin",
+                                            "C:\\Program Files\\nodejs\\",
+                                            "C:\\Program Files (x86)\\PowerShell\\7\\",
+                                            "C:\\Users\\madbo\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\",
+                                            "C:\\Users\\madbo\\AppData\\Local\\Programs\\Python\\Python311\\",
+                                            "C:\\Users\\madbo\\AppData\\Local\\Programs\\Python\\Launcher\\",
+                                            "C:\\Users\\madbo\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\",
+                                            "C:\\Users\\madbo\\AppData\\Local\\Programs\\Python\\Python313\\",
+                                            "C:\\Users\\madbo\\AppData\\Local\\Microsoft\\WindowsApps",
+                                            "C:\\Users\\madbo\\AppData\\Local\\GitHubDesktop\\bin",
+                                            "C:\\Users\\madbo\\AppData\\Local\\Programs\\Microsoft VS Code\\bin",
+                                            "C:\\Users\\madbo\\AppData\\Local\\Programs\\Ollama",
+                                            "C:\\Users\\madbo\\.dotnet\\tools",
+                                            "C:\\Users\\madbo\\AppData\\Roaming\\npm",
+                                            "C:\\FFmpeg\\bin",
+                                            "C:\\Program Files\\Inkscape"
+                                        ],
+                        "proxy":  {
+
+                                  },
+                        "cudaRocm":  {
+
+                                     }
+                    },
+    "ollama":  {
+                   "detected":  true,
+                   "version":  "0.11.7",
+                   "service":  null,
+                   "endpoint":  "http://127.0.0.1:11434",
+                   "apiAlive":  true,
+                   "backend":  "likely CUDA",
+                   "models":  [
+                                  {
+                                      "name":  "qwen3:8b",
+                                      "size":  "4.87 TB",
+                                      "digest":  "500a1f067a9f782620b40bee6f7b0c89e17ae61f686b92c24933e4ca4b2b8b41",
+                                      "modified":  "2025-08-25T18:50:16.4520282-04:00"
+                                  },
+                                  {
+                                      "name":  "llama3:8b",
+                                      "size":  "4.34 TB",
+                                      "digest":  "365c0bd3c000a25d28ddbf732fe1c6add414de7275464c4e4d1c3b5fcb5d8ad1",
+                                      "modified":  "2025-08-25T16:42:47.0556323-04:00"
+                                  },
+                                  {
+                                      "name":  "llama3.1:8b",
+                                      "size":  "4.58 TB",
+                                      "digest":  "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+                                      "modified":  "2025-08-25T15:53:20.356391-04:00"
+                                  },
+                                  {
+                                      "name":  "Tohur/natsumura-storytelling-rp-llama-3.1:latest",
+                                      "size":  "4.58 TB",
+                                      "digest":  "bde0b047d67d5d53194ae90f64b596d128b1a9ae64903115d0b4a963748611e0",
+                                      "modified":  "2025-08-06T12:42:11.0877794-04:00"
+                                  }
+                              ],
+                   "running":  [
+
+                               ],
+                   "storage":  {
+                                   "modelsDir":  "C:\\Users\\madbo\\.ollama\\models",
+                                   "modelsBytes":  19728113355,
+                                   "modelsHuman":  "18.37 TB"
+                               }
+               },
+    "warnings":  [
+
+                 ]
+}
