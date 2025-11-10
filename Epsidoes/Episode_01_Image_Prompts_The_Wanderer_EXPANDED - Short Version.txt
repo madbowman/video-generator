@@ -1,0 +1,145 @@
+EPISODE 1: THE WANDERER
+PIXAR ANIMATION STYLE IMAGE PROMPTS FOR CAPCUT
+
+═══════════════════════════════════════════════════════════════════════════
+CHARACTER REFERENCE (Use for consistency):
+═══════════════════════════════════════════════════════════════════════════
+
+BRAMBLE QUICKWHISKER THISTLEWOOD (Protagonist):
+- Age 40 (young adult gnome), height 2'10"
+- Lean, wiry, athletic build
+- Messy brown hair that never stays down, always falling in eyes
+- Bright hazel eyes (huge and expressive, Pixar-style oversized)
+- Sun-tanned skin with freckles across nose and cheeks
+- Slightly oversized head (classic Pixar gnome proportions)
+- Wears: Earth-tone layered clothing (brown vest over green shirt, tan pants)
+- Simple leather tool belt with various pouches
+- Small canvas bag slung over shoulder
+- Bare feet or soft leather shoes
+- Constantly in motion, fidgeting, expressive body language
+- PIXAR STYLE: Rounded features, expressive face, warm and appealing design, emphasis on large curious eyes and energetic posing
+
+WILLOW THISTLEWOOD (Mother):
+- Age 180, height 2'8"
+- Gentle, nurturing appearance
+- Long brown hair pulled back in practical braid with flowers woven in
+- Kind hazel eyes, warm smile lines
+- Wears: Herbalist's apron over earth-tone dress
+- Always has plant stains on hands
+- PIXAR STYLE: Maternal warmth, soft features, comforting presence
+
+THISTLE THISTLEWOOD (Father):
+- Age 185, height 2'11"
+- Sturdy woodworker build, slightly broader than Bramble
+- Short brown beard, weathered face
+- Calm brown eyes, patient expression
+- Wears: Woodworker's vest with tool loops, practical clothes
+- Often has wood shavings in hair or on clothes
+- PIXAR STYLE: Solid, dependable appearance, strong but gentle
+
+WREN MOSSBEARD (Best Friend):
+- Same age as Bramble, height 2'9"
+- Steady, grounded energy (contrast to Bramble's chaos)
+- Sandy blonde hair in neat braids
+- Green eyes, serene expression
+- Wears: Herbalist apprentice robes in greens and browns
+- Always has plants or herbs in hand
+- PIXAR STYLE: Calm counterpoint to Bramble, gentle features, peaceful expression
+
+COPPER GEARSPRING (Rival/Friend):
+- Same age as Bramble, height 2'10"
+- Confident, successful energy
+- Red-brown hair slicked back, always clean despite workshop work
+- Bright blue eyes, proud smile
+- Wears: Inventor's goggles on forehead, oil-stained vest with gear decorations
+- Carries small inventions in pockets
+- PIXAR STYLE: Slightly cocky posing, successful energy, polished appearance
+
+ELDER ROOTWHISPER:
+- Age 387, height 3'0"
+- Ancient, wise, patient but firm
+- Long gray beard braided with living moss and small flowers
+- Sharp gray eyes that miss nothing despite age
+- Weathered face with deep laugh lines and wisdom lines
+- Wears: Elder's robes in forest greens and browns, decorated with natural elements
+- Wooden staff carved with generations of history
+- PIXAR STYLE: Wise elder design, dignified, commands respect, gentle but authoritative
+
+WORKSHOP MASTERS (Various):
+- Master Cogsworth: Inventor, middle-aged, enthusiastic
+- Master Fernwhisk: Alchemist, ancient, white beard
+- Each distinct in craft-specific clothing
+- PIXAR STYLE: Diverse gnome designs showing age and profession
+
+═══════════════════════════════════════════════════════════════════════════
+SCENE-BY-SCENE IMAGE PROMPTS:
+═══════════════════════════════════════════════════════════════════════════
+
+IMAGE 1: DAWN IN THE FOREST
+Pixar animation style wide establishing shot: Ancient forest canopy with golden morning sunlight streaming through leaves in dramatic god rays, creating dappled patterns on forest floor below. Massive tree trunks disappear upward into dense foliage. Small wisps of chimney smoke curl up from hidden locations within tree roots and hillsides, barely visible, suggesting the hidden gnome village of Roothollow. Rich forest greens and browns dominate, with warm golden morning light. Mist hangs in air between trees. Birds silhouetted against bright patches of sky. Atmosphere peaceful, magical, establishing beauty and safety of gnome forest home. Pixar animation style with emphasis on warm lighting, rich environmental detail, hidden nature of gnome civilization within natural forest.
+
+IMAGE 2: VILLAGE AWAKENING
+Pixar animation style wide shot: Roothollow village integrated seamlessly into forest landscape. Homes built into tree roots with round doors, hillsides with windows, rope bridge platforms connecting trees. Everything gnome-sized and hidden in plain sight. Morning smoke from chimneys. Cozy warm atmosphere. Perhaps one hundred gnomes' worth of dwellings visible but blending with nature. Tree root houses, hillside doors, branch platforms. Scale showing gnome size relative to massive trees. Morning light warm on architecture integrated perfectly with forest. Village waking up with activity beginning. Pixar animation style with emphasis on integrated architecture, hidden village, scale, morning awakening, cozy fantasy village feel.
+
+IMAGE 3: GNOME MORNING CHAOS
+Pixar animation style dynamic wide shot: Village morning chaos in full swing. Alchemist's workshop puffing purple smoke with cheerful shout audible. Three young gnomes playing elaborate hide-and-seek involving climbing and illusion magic with borrowed chicken causing comedy. Experimental water wheel making rhythmic thumping suggesting it works but not as intended. Multiple activities happening simultaneously showing gnome energy and creativity. Morning light bright. Workshop district active. Controlled chaos typical of gnome life. Everything playful and inventive. Pixar animation style with emphasis on multiple simultaneous activities, playful chaos, purple smoke, children playing, inventive dysfunction, morning energy.
+
+═══════════════════════════════════════════════════════════════════════════
+TECHNICAL NOTES FOR IMAGE GENERATION:
+═══════════════════════════════════════════════════════════════════════════
+
+PIXAR STYLE CONSISTENCY:
+- Warm, appealing character designs with slightly oversized heads and expressive eyes
+- Characters have rounded, friendly shapes even when serious
+- Lighting warm and theatrical, emphasizing story beats
+- Environments integrated and organic, gnome homes as part of forest
+- Rich color palette: Forest greens, earth browns, warm golden light
+- Textures tactile but stylized, not photorealistic
+- Scale important: Show gnome size relative to forest and human objects
+- Magic effects: Subtle shimmer, glowing translucent quality
+- Emotional expression through posture and large expressive eyes
+- Background detail supports story without overwhelming characters
+
+COLOR PALETTE PROGRESSION:
+- Morning: Golden dawn light, warm and hopeful
+- Mid-day: Bright clear forest light, exploration
+- Afternoon: Golden deepening light, discovery and danger
+- Late afternoon: Amber dramatic light, consequences
+- Evening: Orange-gold sunset, beauty and melancholy
+- Night: Deep blues, silver starlight, introspection
+
+CHARACTER CONSISTENCY:
+- Bramble: Always messy hair, bright curious eyes, earth-tone layers, tool belt
+- Elder: Gray beard with moss, staff, robes, dignified
+- Parents: Maternal warmth (Willow), sturdy dependability (Thistle)
+- Wren: Neat braids, calm energy, herbalist robes
+- Copper: Slicked hair, oil stains, confident energy
+- Keep clothing, accessories, proportions consistent
+
+ENVIRONMENTAL DETAILS:
+- Gnome homes: Round doors, integrated into trees and hills, cozy scale
+- Workshops: Specialized tools and signs, organized chaos
+- Forest: Living and breathing, protective inside markers
+- Wild forest: Denser, darker, more primal beyond markers
+- Village: Community visible, pathways connecting
+- Human camp: Scale showing gnome tiny versus human objects
+
+EMOTIONAL PROGRESSION:
+- Start: Village life, belonging struggle
+- Middle: Discovery excitement, real danger
+- End: Consequences, teaching, unresolved tension
+- Throughout: Restlessness, curiosity, not fitting in
+
+KEY MOMENTS:
+- Multiple failed apprenticeship belts (visual history)
+- Parents' worry (love and fear)
+- Copper's oblivious success (comparison pain)
+- Wren's steady friendship (grounding)
+- Discovery joy then terror (stag)
+- Elder's teaching (wisdom and warning)
+- Family love despite trouble (unconditional)
+- Stars at window (call to adventure)
+
+═══════════════════════════════════════════════════════════════════════════
+END OF IMAGE PROMPTS - EPISODE 1 EXPANDED
+═══════════════════════════════════════════════════════════════════════════

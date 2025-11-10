@@ -463,12 +463,196 @@ def main():
     if 'characters' not in st.session_state:
         st.session_state.characters = {}
     
+    if 'audio_generation_state' not in st.session_state:
+        st.session_state.audio_generation_state = {
+            'is_running': False,
+            'is_paused': False,
+            'current_scene': 0,
+            'total_scenes': 0,
+            'progress': 0.0,
+            'start_time': None,
+            'pause_time': None
+        }
+    
+    if 'image_generation_state' not in st.session_state:
+        st.session_state.image_generation_state = {
+            'is_running': False,
+            'is_paused': False,
+            'current_scene': 0,
+            'total_scenes': 0,
+            'progress': 0.0,
+            'start_time': None,
+            'pause_time': None
+        }
+    
+    # Auto session management
+    if 'session_auto_loaded' not in st.session_state:
+        st.session_state.session_auto_loaded = False
+    
+    def auto_save_session():
+        """Auto-save current session state"""
+        if st.session_state.scenes:  # Only save if we have data
+            session_data = {
+                'scenes': st.session_state.scenes,
+                'characters': st.session_state.characters,
+                'voice_file_path': getattr(st.session_state, 'voice_file_path', None),
+                'timestamp': time.time()
+            }
+            
+            auto_session_file = st.session_state.generator.output_dir / "auto_session.json"
+            try:
+                with open(auto_session_file, 'w', encoding='utf-8') as f:
+                    json.dump(session_data, f, indent=2, ensure_ascii=False)
+            except Exception as e:
+                pass  # Silently fail to avoid disrupting UI
+    
+    def auto_load_session():
+        """Auto-load the most recent session on startup"""
+        if st.session_state.session_auto_loaded:
+            return None
+        
+        auto_session_file = st.session_state.generator.output_dir / "auto_session.json"
+        
+        if auto_session_file.exists():
+            try:
+                with open(auto_session_file, 'r', encoding='utf-8') as f:
+                    session_data = json.load(f)
+                
+                scenes = session_data.get('scenes', [])
+                if scenes:  # Only load if there's actual data
+                    st.session_state.scenes = scenes
+                    st.session_state.characters = session_data.get('characters', {})
+                    st.session_state.voice_file_path = session_data.get('voice_file_path')
+                    
+                    # Validate existing file paths in scenes and count valid ones
+                    valid_images = 0
+                    valid_audio = 0
+                    
+                    for scene in scenes:
+                        # Validate image path
+                        if scene.get('image_path'):
+                            if os.path.exists(scene['image_path']):
+                                valid_images += 1
+                            else:
+                                # Try to fix relative path issue
+                                if not os.path.isabs(scene['image_path']):
+                                    abs_path = st.session_state.generator.output_dir / scene['image_path']
+                                    if abs_path.exists():
+                                        scene['image_path'] = str(abs_path)
+                                        valid_images += 1
+                        
+                        # Validate audio path
+                        if scene.get('audio_path'):
+                            if os.path.exists(scene['audio_path']):
+                                valid_audio += 1
+                            else:
+                                # Try to fix relative path issue
+                                if not os.path.isabs(scene['audio_path']):
+                                    abs_path = st.session_state.generator.output_dir / scene['audio_path']
+                                    if abs_path.exists():
+                                        scene['audio_path'] = str(abs_path)
+                                        valid_audio += 1
+                    
+                    # Auto-discover any additional files not already linked
+                    discovered_files = auto_discover_files()
+                    
+                    st.session_state.session_auto_loaded = True
+                    
+                    total_images = valid_images + discovered_files['images']
+                    total_audio = valid_audio + discovered_files['audio']
+                    
+                    message_parts = [f"{len(scenes)} scenes"]
+                    if total_images > 0:
+                        message_parts.append(f"{total_images} images")
+                    if total_audio > 0:
+                        message_parts.append(f"{total_audio} audio files")
+                    
+                    return f"🔄 Auto-restored session with {', '.join(message_parts)}"
+            except Exception as e:
+                pass  # Silently fail
+        
+        st.session_state.session_auto_loaded = True
+        return None
+    
+    def auto_discover_files():
+        """Scan output directory for existing files and link them to scenes"""
+        output_dir = st.session_state.generator.output_dir
+        loaded_images = 0
+        loaded_audio = 0
+        
+        # Search directories to check
+        search_dirs = [
+            output_dir,  # Main output directory
+            output_dir / "temp_images",  # Image subdirectory
+            output_dir / "temp_audio",   # Audio subdirectory
+        ]
+        
+        for scene in st.session_state.scenes:
+            scene_number = scene['number']
+            
+            # Look for image files
+            if not (scene.get('image_path') and os.path.exists(scene.get('image_path', ''))):
+                for search_dir in search_dirs:
+                    if not search_dir.exists():
+                        continue
+                    for ext in ['.png', '.jpg', '.jpeg']:
+                        for pattern in [
+                            f"scene_{scene_number:03d}*{ext}",  # 3-digit format (001, 002)
+                            f"scene_{scene_number:02d}*{ext}",  # 2-digit format (01, 02)
+                            f"scene_{scene_number}*{ext}",      # No padding (1, 2)
+                            f"img_{scene_number:03d}*{ext}",
+                            f"img_{scene_number:02d}*{ext}",
+                            f"img_{scene_number}*{ext}",
+                            f"image_{scene_number:03d}*{ext}",
+                            f"image_{scene_number:02d}*{ext}",
+                            f"image_{scene_number}*{ext}"
+                        ]:
+                            matching_files = list(search_dir.glob(pattern))
+                            if matching_files:
+                                image_path = max(matching_files, key=lambda p: p.stat().st_mtime)
+                                if image_path.exists():
+                                    scene['image_path'] = str(image_path)
+                                    loaded_images += 1
+                                    break
+                        if scene.get('image_path'):
+                            break
+                    if scene.get('image_path'):
+                        break
+            
+            # Look for audio files
+            if not (scene.get('audio_path') and os.path.exists(scene.get('audio_path', ''))):
+                for search_dir in search_dirs:
+                    if not search_dir.exists():
+                        continue
+                    for ext in ['.wav', '.mp3', '.m4a']:
+                        for pattern in [
+                            f"scene_{scene_number:03d}*{ext}",  # 3-digit format (001, 002)
+                            f"scene_{scene_number:02d}*{ext}",  # 2-digit format (01, 02)
+                            f"scene_{scene_number}*{ext}",      # No padding (1, 2)
+                            f"audio_{scene_number:03d}*{ext}",
+                            f"audio_{scene_number:02d}*{ext}",
+                            f"audio_{scene_number}*{ext}"
+                        ]:
+                            matching_files = list(search_dir.glob(pattern))
+                            if matching_files:
+                                audio_path = max(matching_files, key=lambda p: p.stat().st_mtime)
+                                if audio_path.exists():
+                                    scene['audio_path'] = str(audio_path)
+                                    loaded_audio += 1
+                                    break
+                        if scene.get('audio_path'):
+                            break
+                    if scene.get('audio_path'):
+                        break
+        
+        return {'images': loaded_images, 'audio': loaded_audio}
+    
     # Sidebar for settings
     with st.sidebar:
         st.title("⚙️ Settings")
         
         # ComfyUI connection test
-        if st.button("🔌 Test ComfyUI Connection"):
+        if st.button("🔌 Test ComfyUI Connection", key="test_comfyui"):
             try:
                 response = requests.get(f"{st.session_state.generator.comfyui_url}/system_stats", timeout=5)
                 if response.status_code == 200:
@@ -517,7 +701,7 @@ def main():
         if hasattr(st.session_state, 'voice_file_path') and st.session_state.voice_file_path:
             if os.path.exists(st.session_state.voice_file_path):
                 st.success("🎙️ Voice sample ready")
-                if st.button("🗑️ Clear Voice Sample"):
+                if st.button("🗑️ Clear Voice Sample", key="clear_voice"):
                     try:
                         os.remove(st.session_state.voice_file_path)
                     except:
@@ -534,7 +718,7 @@ def main():
         st.markdown("### 💾 Session Management")
         
         # Save/Load session
-        if st.button("💾 Save Session"):
+        if st.button("💾 Save Session", key="save_session"):
             session_data = {
                 'scenes': st.session_state.scenes,
                 'characters': st.session_state.characters,
@@ -558,7 +742,7 @@ def main():
                 help="Load a previously saved session"
             )
             
-            if selected_session and st.button("📂 Load Session"):
+            if selected_session and st.button("📂 Load Session", key="load_session"):
                 session_file = st.session_state.generator.output_dir / selected_session
                 try:
                     with open(session_file, 'r', encoding='utf-8') as f:
@@ -574,10 +758,20 @@ def main():
                     st.error(f"❌ Error loading session: {e}")
         
         # Cleanup old temp files
-        if st.button("🧹 Cleanup Temp Files"):
+        if st.button("🧹 Cleanup Temp Files", key="cleanup_temp"):
             temp_files_removed = 0
+            audio_files_removed = 0
+            voice_files_removed = 0
             
-            # Remove old temp voice files
+            # Remove old temp voice files (root directory)
+            for temp_file in Path(".").glob("temp_voice_*.wav"):
+                try:
+                    os.remove(temp_file)
+                    temp_files_removed += 1
+                except:
+                    pass
+            
+            # Remove temp voice files from output directory
             for temp_file in st.session_state.generator.output_dir.glob("temp_voice_*.wav"):
                 try:
                     os.remove(temp_file)
@@ -596,21 +790,79 @@ def main():
                 except:
                     pass
             
-            st.success(f"✅ Removed {temp_files_removed} temporary files")
+            # Remove ALL audio files from temp_audio directory
+            temp_audio_dir = st.session_state.generator.temp_audio_dir
+            if temp_audio_dir.exists():
+                for audio_file in temp_audio_dir.glob("scene_*.wav"):
+                    try:
+                        os.remove(audio_file)
+                        audio_files_removed += 1
+                    except:
+                        pass
+            
+            # Remove voice samples (with confirmation)
+            voice_samples_dir = st.session_state.generator.output_dir / "voice_samples"
+            if voice_samples_dir.exists():
+                for voice_file in voice_samples_dir.glob("session_voice_*"):
+                    try:
+                        os.remove(voice_file)
+                        voice_files_removed += 1
+                    except:
+                        pass
+            
+            # Clear current voice file path from session
+            if hasattr(st.session_state, 'voice_file_path'):
+                st.session_state.voice_file_path = None
+            
+            # Reset audio generation state
+            st.session_state.audio_generation_state = {
+                'is_running': False,
+                'is_paused': False,
+                'current_scene': 0,
+                'total_scenes': 0,
+                'progress': 0.0,
+                'start_time': None,
+                'pause_time': None
+            }
+            
+            # Clear audio paths from scenes
+            for scene in st.session_state.scenes:
+                scene['audio_path'] = None
+            
+            total_removed = temp_files_removed + audio_files_removed + voice_files_removed
+            
+            if total_removed > 0:
+                st.success(f"✅ Cleanup Complete!")
+                st.info(f"🗑️ Removed {temp_files_removed} temp files, {audio_files_removed} audio files, {voice_files_removed} voice samples")
+            else:
+                st.info("ℹ️ No files to cleanup")
     
     # Main interface
     st.title("🎬 Episode Video Generator")
     st.markdown("Create MP4 videos from episode scripts with AI-generated images and TTS audio")
     
-    # Tabs for different steps
-    tab1, tab2, tab3, tab4 = st.tabs([
-        "📄 Import", 
-        "🎨 Timeline & Images", 
-        "🎙️ Audio", 
-        "🎬 Video"
-    ])
+    # Auto-load previous session on startup
+    if not st.session_state.session_auto_loaded:
+        auto_load_message = auto_load_session()
+        if auto_load_message:
+            st.success(auto_load_message)
     
-    with tab1:
+    # Navigation using radio buttons (persists across reruns)
+    if 'active_tab' not in st.session_state:
+        st.session_state.active_tab = "📄 Import"
+    
+    active_tab = st.radio(
+        "Navigation",
+        ["📄 Import", "🎨 Timeline & Production", "🎬 Video"],
+        index=["📄 Import", "🎨 Timeline & Production", "🎬 Video"].index(st.session_state.active_tab),
+        horizontal=True,
+        label_visibility="collapsed"
+    )
+    st.session_state.active_tab = active_tab
+    
+    st.divider()
+    
+    if active_tab == "📄 Import":
         st.header("📄 Import Episode Files")
         
         col1, col2 = st.columns(2)
@@ -629,7 +881,7 @@ def main():
                 help="Upload your image prompts file with CHARACTER REFERENCE and IMAGE sections"
             )
         
-        if st.button("📖 Parse Files", type="primary"):
+        if st.button("📖 Parse Files", type="primary", key="parse_files"):
             if script_file and prompts_file:
                 # Save uploaded files temporarily
                 script_path = f"temp_script_{int(time.time())}.txt"
@@ -652,8 +904,17 @@ def main():
                 st.session_state.scenes = scenes
                 st.session_state.characters = characters
                 
+                # Auto-discover existing files for newly parsed scenes
+                loaded_files = auto_discover_files()
+                
+                # Auto-save the session
+                auto_save_session()
+                
                 if scenes:
-                    st.success(f"✅ Successfully parsed {len(scenes)} scenes and {len(characters)} characters")
+                    success_msg = f"✅ Successfully parsed {len(scenes)} scenes and {len(characters)} characters"
+                    if loaded_files['images'] > 0 or loaded_files['audio'] > 0:
+                        success_msg += f" (Found {loaded_files['images']} existing images, {loaded_files['audio']} audio files)"
+                    st.success(success_msg)
                     
                     # Show preview
                     with st.expander("📋 Parsed Content Preview"):
@@ -671,42 +932,179 @@ def main():
             else:
                 st.error("❌ Please upload both script and prompts files")
     
-    with tab2:
-        st.header("🎨 Timeline & Image Generation")
+    elif active_tab == "🎨 Timeline & Production":
+        st.header("🎨 Timeline & Production")
+        st.caption("Generate and manage images and audio for each scene")
         
         if not st.session_state.scenes:
             st.info("📄 Please import and parse episode files first")
         else:
-            # Top controls
-            col1, col2, col3 = st.columns([2, 1, 1])
+            # Top controls with pause/resume functionality
+            col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
             
             with col1:
-                st.write(f"**Episode Overview:** {len(st.session_state.scenes)} scenes found")
+                image_state = st.session_state.image_generation_state
+                
+                if image_state['is_running']:
+                    st.write(f"**🎨 Generating Images:** Scene {image_state['current_scene']}/{image_state['total_scenes']}")
+                    
+                    # Progress bar
+                    progress_value = image_state['current_scene'] / image_state['total_scenes'] if image_state['total_scenes'] > 0 else 0
+                    st.progress(progress_value)
+                    
+                    # Estimated time
+                    if image_state['start_time']:
+                        elapsed = time.time() - image_state['start_time']
+                        if image_state['current_scene'] > 0:
+                            avg_time_per_scene = elapsed / image_state['current_scene']
+                            remaining_scenes = image_state['total_scenes'] - image_state['current_scene']
+                            est_remaining = avg_time_per_scene * remaining_scenes
+                            st.caption(f"⏱️ Estimated remaining: {int(est_remaining/60)}m {int(est_remaining%60)}s")
+                else:
+                    # Count pending scenes
+                    pending_scenes = sum(1 for scene in st.session_state.scenes 
+                                       if not (scene.get('image_path') and os.path.exists(scene.get('image_path', ''))))
+                    completed_scenes = len(st.session_state.scenes) - pending_scenes
+                    
+                    st.write(f"**Image Overview:** {completed_scenes}/{len(st.session_state.scenes)} scenes completed")
+                    if pending_scenes > 0:
+                        st.info(f"📋 {pending_scenes} scenes need image generation")
+                    else:
+                        st.success("✅ All scenes have images!")
             
             with col2:
-                if st.button("🎨 Generate All Images", type="primary"):
-                    progress_bar = st.progress(0)
-                    status_text = st.empty()
-                    
-                    for i, scene in enumerate(st.session_state.scenes):
-                        progress = i / len(st.session_state.scenes)
-                        progress_bar.progress(progress)
-                        status_text.text(f"Generating scene {scene['number']}: {scene['title']}")
+                if not image_state['is_running']:
+                    if st.button("🎨 Start/Resume Images", type="primary", key="img_start_resume"):
+                        image_state['is_running'] = True
+                        image_state['is_paused'] = False
+                        image_state['total_scenes'] = len(st.session_state.scenes)
+                        image_state['start_time'] = time.time()
                         
-                        image_path = st.session_state.generator.generate_single_image(
-                            scene, selected_model, st.session_state.characters
-                        )
+                        # Find first scene without image
+                        for i, scene in enumerate(st.session_state.scenes):
+                            if not (scene.get('image_path') and os.path.exists(scene.get('image_path', ''))):
+                                image_state['current_scene'] = i
+                                break
+                        else:
+                            image_state['current_scene'] = len(st.session_state.scenes)
                         
-                        if image_path:
-                            scene['image_path'] = image_path
-                    
-                    progress_bar.progress(1.0)
-                    status_text.text("✅ All images generated!")
-                    st.rerun()
+                        st.rerun()
+                else:
+                    if st.button("⏸️ Pause", type="secondary", key="img_pause"):
+                        image_state['is_running'] = False
+                        image_state['is_paused'] = True
+                        image_state['pause_time'] = time.time()
+                        st.success("⏸️ Image generation paused. Click Resume to continue.")
+                        st.rerun()
             
             with col3:
-                if st.button("🔄 Refresh View"):
+                if image_state['is_paused']:
+                    if st.button("▶️ Resume", type="primary", key="img_resume"):
+                        image_state['is_running'] = True
+                        image_state['is_paused'] = False
+                        # Adjust start time to account for pause
+                        if image_state['pause_time'] and image_state['start_time']:
+                            pause_duration = time.time() - image_state['pause_time']
+                            image_state['start_time'] += pause_duration
+                        st.rerun()
+                
+                if st.button("🛑 Stop & Reset", key="img_stop_reset"):
+                    image_state['is_running'] = False
+                    image_state['is_paused'] = False
+                    image_state['current_scene'] = 0
+                    image_state['progress'] = 0.0
+                    image_state['start_time'] = None
+                    st.success("🛑 Image generation stopped and reset.")
                     st.rerun()
+            
+            with col4:
+                if st.button("🔄 Refresh View", key="img_refresh"):
+                    st.rerun()
+            
+            # Auto-generation logic when running
+            if image_state['is_running'] and not image_state['is_paused']:
+                # Find next scene that needs image
+                scenes_to_process = []
+                for i, scene in enumerate(st.session_state.scenes):
+                    if not (scene.get('image_path') and os.path.exists(scene.get('image_path', ''))):
+                        scenes_to_process.append((i, scene))
+                
+                if scenes_to_process:
+                    # Process next scene
+                    scene_idx, scene = scenes_to_process[0]
+                    image_state['current_scene'] = scene_idx + 1
+                    
+                    progress_placeholder = st.empty()
+                    status_placeholder = st.empty()
+                    
+                    with progress_placeholder.container():
+                        st.info(f"🎨 Generating image for Scene {scene['number']}: {scene['title']}")
+                    
+                    with status_placeholder.container():
+                        with st.spinner(f"Processing scene {scene['number']}..."):
+                            image_path = st.session_state.generator.generate_single_image(
+                                scene, selected_model, st.session_state.characters
+                            )
+                            
+                            if image_path:
+                                scene['image_path'] = image_path
+                                # Auto-save session when new image is generated
+                                auto_save_session()
+                    
+                    progress_placeholder.empty()
+                    status_placeholder.empty()
+                    
+                    # Check if we're done
+                    remaining = len([s for s in st.session_state.scenes 
+                                   if not (s.get('image_path') and os.path.exists(s.get('image_path', '')))])
+                    
+                    if remaining == 0:
+                        image_state['is_running'] = False
+                        image_state['is_paused'] = False
+                        st.success("🎉 All image generation completed!")
+                        st.balloons()
+                    
+                    # Auto-refresh to continue with next scene
+                    time.sleep(1)
+                    st.rerun()
+                else:
+                    # All scenes processed
+                    image_state['is_running'] = False
+                    image_state['is_paused'] = False
+                    st.success("✅ All scenes have images!")
+            
+            st.divider()
+            
+            # Image generation statistics
+            if st.session_state.scenes:
+                image_stats_col1, image_stats_col2, image_stats_col3 = st.columns(3)
+                
+                with image_stats_col1:
+                    completed = sum(1 for s in st.session_state.scenes 
+                                  if s.get('image_path') and os.path.exists(s.get('image_path', '')))
+                    st.metric("Completed Images", f"{completed}/{len(st.session_state.scenes)}")
+                
+                with image_stats_col2:
+                    if image_state['start_time'] and completed > 0:
+                        elapsed = time.time() - image_state['start_time']
+                        avg_per_scene = elapsed / completed
+                        st.metric("Avg Time/Scene", f"{avg_per_scene:.1f}s")
+                    else:
+                        st.metric("Avg Time/Scene", "--")
+                
+                with image_stats_col3:
+                    # Calculate total file size of generated images
+                    total_size = 0
+                    for scene in st.session_state.scenes:
+                        if scene.get('image_path') and os.path.exists(scene.get('image_path', '')):
+                            try:
+                                size_bytes = os.path.getsize(scene['image_path'])
+                                total_size += size_bytes
+                            except:
+                                pass
+                    
+                    total_mb = total_size / (1024 * 1024)
+                    st.metric("Total Images Size", f"{total_mb:.1f} MB")
             
             st.divider()
             
@@ -716,7 +1114,7 @@ def main():
                 
                 with st.container():
                     # Scene header with status indicators
-                    col_header1, col_header2, col_header3, col_header4 = st.columns([3, 1, 1, 1])
+                    col_header1, col_header2, col_header3 = st.columns([4, 1, 1])
                     
                     with col_header1:
                         st.subheader(f"Scene {scene['number']}: {scene['title']}")
@@ -731,31 +1129,29 @@ def main():
                     with col_header3:
                         has_audio = scene.get('audio_path') and os.path.exists(scene.get('audio_path', ''))
                         if has_audio:
-                            st.success("🎙️ Audio ✅")
+                            # Calculate and display actual audio duration
+                            try:
+                                import wave
+                                with wave.open(scene['audio_path'], 'r') as wav_file:
+                                    frames = wav_file.getnframes()
+                                    rate = wav_file.getframerate()
+                                    duration = frames / float(rate)
+                                    scene['duration'] = duration  # Store actual audio duration
+                                    st.success(f"🎙️ Audio {duration:.1f}s")
+                            except:
+                                st.success("🎙️ Audio ✅")
                         else:
                             st.warning("🎙️ No audio")
                     
-                    with col_header4:
-                        duration = st.number_input(
-                            "Duration (s)",
-                            min_value=1.0,
-                            max_value=30.0,
-                            value=scene.get('duration', 5.0),
-                            step=0.5,
-                            key=f"duration_{scene['number']}",
-                            label_visibility="collapsed"
-                        )
-                        scene['duration'] = duration
-                    
-                    # Main content area
-                    col_content1, col_content2, col_content3 = st.columns([2, 2, 1])
+                    # Main content area - 3 columns for script, image, and audio
+                    col_content1, col_content2, col_content3 = st.columns([2, 2, 2])
                     
                     with col_content1:
                         st.write("**Script Text:**")
                         script_text = st.text_area(
                             "Script",
                             value=scene['script_text'],
-                            height=120,
+                            height=200,
                             key=f"script_edit_{scene['number']}",
                             label_visibility="collapsed"
                         )
@@ -766,287 +1162,87 @@ def main():
                         image_prompt = st.text_area(
                             "Image Prompt",
                             value=current_prompt,
-                            height=80,
+                            height=200,
                             key=f"prompt_edit_{scene['number']}",
                             label_visibility="collapsed"
                         )
                         scene['image_prompts'] = [image_prompt] if image_prompt else scene['image_prompts']
                     
                     with col_content2:
+                        st.write("**Image:**")
                         # Image display and generation controls
                         if has_image:
                             st.image(scene['image_path'], caption=f"Scene {scene['number']}", use_container_width=True)
                         else:
                             st.info("No image generated yet")
                         
-                        # Individual generation controls
-                        col_gen1, col_gen2 = st.columns(2)
-                        
-                        with col_gen1:
-                            if st.button(f"🎨 Generate", key=f"gen_{scene['number']}", use_container_width=True):
-                                with st.spinner(f"Generating scene {scene['number']}..."):
-                                    image_path = st.session_state.generator.generate_single_image(
-                                        scene, selected_model, st.session_state.characters
-                                    )
-                                    
-                                    if image_path:
-                                        scene['image_path'] = image_path
-                                        st.success(f"✅ Generated!")
-                                        st.rerun()
-                        
-                        with col_gen2:
-                            custom_seed = st.number_input(
-                                "Seed",
-                                value=None,
-                                min_value=0,
-                                key=f"seed_{scene['number']}",
-                                label_visibility="collapsed",
-                                placeholder="Random"
-                            )
-                            
-                            if st.button(f"🔄 Regen", key=f"regen_{scene['number']}", use_container_width=True):
-                                with st.spinner(f"Regenerating scene {scene['number']}..."):
-                                    image_path = st.session_state.generator.generate_single_image(
-                                        scene, selected_model, st.session_state.characters, custom_seed
-                                    )
-                                    
-                                    if image_path:
-                                        scene['image_path'] = image_path
-                                        st.success(f"✅ Regenerated!")
-                                        st.rerun()
-                    
-                    with col_content3:
-                        st.write("**Actions:**")
-                        
-                        if st.button(f"📝 Save Changes", key=f"save_{scene['number']}", use_container_width=True):
-                            st.success("✅ Saved!")
-                        
-                        if has_image and st.button(f"👁️ Preview", key=f"preview_{scene['number']}", use_container_width=True):
-                            with st.expander(f"Full Preview - Scene {scene['number']}", expanded=True):
-                                st.image(scene['image_path'], use_container_width=True)
-                                st.write(f"**Prompt:** {scene['image_prompts'][0] if scene['image_prompts'] else 'No prompt'}")
-                        
-                        if st.button(f"🗑️ Reset Image", key=f"reset_{scene['number']}", use_container_width=True):
-                            if scene.get('image_path'):
+                        # Individual image generation controls
+                        if st.button(f"🎨 Generate Image", key=f"gen_{scene['number']}", use_container_width=True):
+                            # Delete existing image file if it exists
+                            if scene.get('image_path') and os.path.exists(scene['image_path']):
                                 try:
                                     os.remove(scene['image_path'])
                                 except:
                                     pass
                                 scene['image_path'] = None
-                                st.success("✅ Reset!")
-                                st.rerun()
-                
-                st.divider()
-    
-    with tab3:
-        st.header("🎙️ Audio Generation")
-        
-        if not st.session_state.scenes:
-            st.info("📄 Please import and parse episode files first")
-        else:
-            if not AUDIO_AVAILABLE:
-                st.error("❌ Audio system not available. Please install chatterbox-tts.")
-            else:
-                # Top controls
-                col1, col2, col3 = st.columns([2, 1, 1])
-                
-                with col1:
-                    st.write(f"**Audio Overview:** {len(st.session_state.scenes)} scenes to process")
-                
-                with col2:
-                    if st.button("🎙️ Generate All Audio", type="primary"):
-                        voice_path = getattr(st.session_state, 'voice_file_path', None)
-                        
-                        progress_bar = st.progress(0)
-                        status_text = st.empty()
-                        
-                        for i, scene in enumerate(st.session_state.scenes):
-                            progress = i / len(st.session_state.scenes)
-                            progress_bar.progress(progress)
-                            status_text.text(f"Generating audio for scene {scene['number']}")
                             
-                            audio_path = st.session_state.generator.generate_scene_audio(
-                                scene.get('audio_script', scene['script_text']), scene['number'], voice_path
-                            )
-                            
-                            if audio_path:
-                                scene['audio_path'] = audio_path
-                        
-                        progress_bar.progress(1.0)
-                        status_text.text("✅ All audio generated!")
-                        st.rerun()
-                
-                with col3:
-                    if st.button("🔄 Refresh Audio View"):
-                        st.rerun()
-                
-                st.divider()
-                
-                # Individual scene audio controls with editable text
-                for i, scene in enumerate(st.session_state.scenes):
-                    with st.container():
-                        # Scene header with audio status
-                        col_header1, col_header2, col_header3 = st.columns([3, 1, 1])
-                        
-                        with col_header1:
-                            st.subheader(f"Scene {scene['number']}: {scene['title']}")
-                        
-                        with col_header2:
-                            has_audio = scene.get('audio_path') and os.path.exists(scene.get('audio_path', ''))
-                            if has_audio:
-                                st.success("🎙️ Audio ✅")
-                            else:
-                                st.warning("🎙️ No audio")
-                        
-                        with col_header3:
-                            # Audio duration if available
-                            if has_audio:
-                                try:
-                                    import wave
-                                    with wave.open(scene['audio_path'], 'r') as wav_file:
-                                        frames = wav_file.getnframes()
-                                        rate = wav_file.getframerate()
-                                        duration = frames / float(rate)
-                                        st.info(f"⏱️ {duration:.1f}s")
-                                except:
-                                    st.info("⏱️ Audio")
-                            else:
-                                st.info("⏱️ --")
-                        
-                        # Main content area
-                        col_content1, col_content2, col_content3 = st.columns([2, 2, 1])
-                        
-                        with col_content1:
-                            st.write("**Audio Script Text:**")
-                            
-                            # Editable text for audio generation
-                            audio_script = st.text_area(
-                                "Audio Script",
-                                value=scene['script_text'],
-                                height=120,
-                                key=f"audio_script_{scene['number']}",
-                                help="Edit this text to refine the audio narration. Remove scene markers, add pauses with periods, adjust for natural speech.",
-                                label_visibility="collapsed"
-                            )
-                            
-                            # Update scene script if changed
-                            if audio_script != scene['script_text']:
-                                scene['audio_script'] = audio_script
-                            else:
-                                scene['audio_script'] = scene['script_text']
-                            
-                            # Character count and estimated duration
-                            char_count = len(audio_script.strip())
-                            estimated_duration = char_count / 12  # Rough estimate: ~12 chars per second
-                            st.caption(f"📝 {char_count} characters • ~{estimated_duration:.1f}s estimated duration")
-                            
-                            # Audio generation controls
-                            col_gen1, col_gen2 = st.columns(2)
-                            
-                            with col_gen1:
-                                if st.button(f"🎙️ Generate Audio", key=f"gen_audio_{scene['number']}", use_container_width=True):
-                                    voice_path = getattr(st.session_state, 'voice_file_path', None)
-                                    
-                                    with st.spinner(f"Generating audio for scene {scene['number']}..."):
-                                        audio_path = st.session_state.generator.generate_scene_audio(
-                                            scene.get('audio_script', scene['script_text']), 
-                                            scene['number'], 
-                                            voice_path
-                                        )
-                                        
-                                        if audio_path:
-                                            scene['audio_path'] = audio_path
-                                            st.success(f"✅ Audio generated!")
-                                            st.rerun()
-                            
-                            with col_gen2:
-                                if st.button(f"🔄 Regenerate", key=f"regen_audio_{scene['number']}", use_container_width=True):
-                                    voice_path = getattr(st.session_state, 'voice_file_path', None)
-                                    
-                                    with st.spinner(f"Regenerating audio for scene {scene['number']}..."):
-                                        audio_path = st.session_state.generator.generate_scene_audio(
-                                            scene.get('audio_script', scene['script_text']), 
-                                            scene['number'], 
-                                            voice_path
-                                        )
-                                        
-                                        if audio_path:
-                                            scene['audio_path'] = audio_path
-                                            st.success(f"✅ Audio regenerated!")
-                                            st.rerun()
-                        
-                        with col_content2:
-                            st.write("**Audio Playback:**")
-                            
-                            if has_audio:
-                                st.audio(scene['audio_path'])
+                            with st.spinner(f"Generating scene {scene['number']}..."):
+                                image_path = st.session_state.generator.generate_single_image(
+                                    scene, selected_model, st.session_state.characters
+                                )
                                 
-                                # Audio file info
-                                try:
-                                    file_size = os.path.getsize(scene['audio_path']) / 1024  # KB
-                                    st.caption(f"📁 {file_size:.1f} KB")
-                                except:
-                                    pass
-                            else:
-                                st.info("No audio generated yet")
-                            
-                            # Audio quality controls
-                            st.write("**Audio Settings:**")
-                            
-                            # Emotion tags for TTS (if supported)
-                            emotion = st.selectbox(
-                                "Emotion/Style",
-                                ["neutral", "excited", "calm", "dramatic", "whisper"],
-                                key=f"emotion_{scene['number']}",
-                                help="Adjust the emotional tone of the narration"
-                            )
-                            
-                            # Speed control
-                            speed = st.slider(
-                                "Speech Speed",
-                                min_value=0.5,
-                                max_value=1.5,
-                                value=1.0,
-                                step=0.1,
-                                key=f"speed_{scene['number']}",
-                                help="Adjust speech rate (1.0 = normal)"
-                            )
+                                if image_path:
+                                    scene['image_path'] = image_path
+                                    auto_save_session()
+                                    st.success(f"✅ Generated!")
+                                    st.rerun()
+                    
+                    with col_content3:
+                        st.write("**Audio:**")
+                        # Audio playback
+                        if has_audio:
+                            st.audio(scene['audio_path'])
+                            try:
+                                import wave
+                                with wave.open(scene['audio_path'], 'r') as wav_file:
+                                    frames = wav_file.getnframes()
+                                    rate = wav_file.getframerate()
+                                    duration = frames / float(rate)
+                                    st.caption(f"⏱️ {duration:.1f}s")
+                            except:
+                                pass
+                        else:
+                            st.info("No audio generated yet")
                         
-                        with col_content3:
-                            st.write("**Actions:**")
-                            
-                            if st.button(f"📝 Save Script", key=f"save_audio_{scene['number']}", use_container_width=True):
-                                scene['script_text'] = scene.get('audio_script', scene['script_text'])
-                                st.success("✅ Script saved!")
-                            
-                            if has_audio and st.button(f"🎵 Preview", key=f"preview_audio_{scene['number']}", use_container_width=True):
-                                with st.expander(f"Audio Preview - Scene {scene['number']}", expanded=True):
-                                    st.audio(scene['audio_path'])
-                                    st.write(f"**Script:** {scene.get('audio_script', scene['script_text'])[:200]}...")
-                            
-                            if st.button(f"🗑️ Delete Audio", key=f"delete_audio_{scene['number']}", use_container_width=True):
-                                if scene.get('audio_path'):
+                        # Audio generation controls
+                        if AUDIO_AVAILABLE:
+                            if st.button(f"🎙️ Generate Audio", key=f"gen_audio_{scene['number']}", use_container_width=True):
+                                # Delete existing audio file if it exists
+                                if scene.get('audio_path') and os.path.exists(scene['audio_path']):
                                     try:
                                         os.remove(scene['audio_path'])
                                     except:
                                         pass
                                     scene['audio_path'] = None
-                                    st.success("✅ Audio deleted!")
-                                    st.rerun()
-                            
-                            # Quick text processing buttons
-                            if st.button(f"🧹 Clean Text", key=f"clean_{scene['number']}", use_container_width=True):
-                                # Remove scene markers and clean text for better TTS
-                                clean_text = re.sub(r'\[.*?\]', '', scene['script_text'])
-                                clean_text = re.sub(r'\n+', ' ', clean_text)
-                                clean_text = clean_text.strip()
-                                scene['audio_script'] = clean_text
-                                st.success("✅ Text cleaned!")
-                                st.rerun()
-                    
-                    st.divider()
+                                
+                                voice_path = getattr(st.session_state, 'voice_file_path', None)
+                                
+                                with st.spinner(f"Generating audio for scene {scene['number']}..."):
+                                    audio_path = st.session_state.generator.generate_scene_audio(
+                                        scene.get('audio_script', scene['script_text']), 
+                                        scene['number'], 
+                                        voice_path
+                                    )
+                                    
+                                    if audio_path:
+                                        scene['audio_path'] = audio_path
+                                        auto_save_session()
+                                        st.success(f"✅ Generated!")
+                                        st.rerun()
+                        else:
+                            st.warning("Audio system not available")
     
-    with tab4:
+    elif active_tab == "🎬 Video":
         st.header("🎬 Video Assembly")
         
         if not st.session_state.scenes:
